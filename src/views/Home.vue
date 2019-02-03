@@ -43,7 +43,6 @@ import { ipcRenderer } from "electron";
 const opn = require("opn");
 
 export default {
-  name: "home",
   data() {
     return {
       port: 0,

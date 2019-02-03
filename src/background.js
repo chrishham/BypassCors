@@ -34,7 +34,7 @@ if (!gotTheLock) {
 protocol.registerStandardSchemes(['app'], { secure: true })
 function createWindow () {
   // Create the browser window.
-  win = new BrowserWindow({ width: 800, height: 600 })
+  win = new BrowserWindow({ width: 800, height: 680 })
 
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
@@ -45,6 +45,8 @@ function createWindow () {
     // Load the index.html when not in development
     win.loadURL('app://./index.html')
   }
+
+  win.webContents.on('did-finish-load', winIsReady)
 
   win.on('closed', () => {
     win = null
@@ -95,26 +97,68 @@ if (isDevelopment) {
 }
 
 /*
+ Enable Bypass Cors to start at startup
+ */
+var bypassCorsAutoLauncher = new AutoLaunch({
+  name: 'Bypass Cors',
+  path: '/Applications/bypass-cors.app',
+});
+
+bypassCorsAutoLauncher.enable();
+
+bypassCorsAutoLauncher.isEnabled()
+  .then(function (isEnabled) {
+    if (isEnabled) {
+      console.log('Bypass cors is enabled to start at startup!')
+      return;
+    }
+    bypassCorsAutoLauncher.enable();
+  })
+  .catch(function (err) {
+    console.log(error)
+  });
+
+/*
  Bypass Cors configuration.
 */
 
 let expressServer
 
-app.on('ready', () => {
+function winIsReady () {
+  console.log('Window is ready!')
   if (!settings.has('expressServerSettings')) {
     settings.set('expressServerSettings', {
       port: '3167',
       whitelistDomains: []
     });
   }
-  let { port, whitelistDomains } = settings.get('expressServerSettings')
-  expressServer = ExpressApp(port, whitelistDomains)
-})
+  let expressServerSettings = settings.get('expressServerSettings')
+  restartExpressServer(expressServerSettings)
+}
+
+function restartExpressServer (expressServerSettings) {
+  if (expressServer) expressServer.close();
+  expressServer = ExpressApp(expressServerSettings)
+  expressServer.on('error', function (e) {
+    let message = e.message
+    console.log(message)
+    if (/EADDRINUSE/.test(e.message)) message = "Port is already in use. Please try a different one."
+    if (/EACCES/.test(e.message)) message = "You don't have permissions to use this port. Try the 1024 - 65535 range."
+    expressServer.removeListener('success', success)
+    expressServer.close()
+    win.webContents.send('expressServerError', message)
+  });
+  expressServer.on('success', success)
+
+  function success () {
+    console.log('main process received success message!')
+    win.webContents.send('expressServerSuccess')
+  };
+}
 
 ipcMain.on('restartExpressServer', (event, expressServerSettings) => {
   settings.set('expressServerSettings', expressServerSettings)
-  if (expressServer) expressServer.close();
-  expressServer = ExpressApp(expressServerSettings.port, expressServerSettings.whitelistDomains)
+  restartExpressServer(expressServerSettings)
   win.webContents.send('expressServerSettings', expressServerSettings)
 })
 

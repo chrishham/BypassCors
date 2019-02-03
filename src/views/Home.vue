@@ -11,7 +11,7 @@
         section(v-else)
           span.red.dot 
           | Bypass Cors Server is down!
-          b-alert.mt-2(variant="danger" show) {{errorMessage}}
+          b-alert.mt-2(variant="danger" v-if="errorMessage" show) {{errorMessage}}
       hr
       .settings
         h3 Change Server Settings
@@ -33,7 +33,7 @@
           | (1 domain per line) : 
         br
         textarea#whitelistDomains(type="number" v-model="whitelistDomainsTextarea" placeholder="Type here the domains that are allowed to use Bypass Cors ...")
-        b-button.mb-2(variant="primary" @click="restartServer" :disabled="behindProxy && !proxy") Restart Server
+        b-button.mb-2(variant="primary" @click="restartServer" :disabled="(behindProxy && !proxy) || port<0  || port > 65535") Restart Server
         b-button.mb-2(variant="danger" @click="revertChanges") Revert Changes
 </template>
 
@@ -109,24 +109,24 @@ export default {
       ipcRenderer.send("getExpressServerSettings");
     },
     expressServerError(event, message) {
-      this.$notify({
-        message,
-        type: "danger",
-        timeout: 5000,
-        horizontalAlign: "center",
-        verticalAlign: "top"
-      });
+      // this.$notify({
+      //   message,
+      //   type: "danger",
+      //   timeout: 5000,
+      //   horizontalAlign: "center",
+      //   verticalAlign: "top"
+      // });
       this.serverIsUp = false;
       this.errorMessage = message;
     },
     expressServerSuccess(event, message) {
-      this.$notify({
-        message: "Server restart: Success!",
-        type: "success",
-        timeout: 5000,
-        horizontalAlign: "center",
-        verticalAlign: "top"
-      });
+      // this.$notify({
+      //   message: "Server restart: Success!",
+      //   type: "success",
+      //   timeout: 5000,
+      //   horizontalAlign: "center",
+      //   verticalAlign: "top"
+      // });
       this.serverIsUp = true;
     },
     open(url) {

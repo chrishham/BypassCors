@@ -1,16 +1,35 @@
 'use strict'
 
-import { app, protocol, BrowserWindow } from 'electron'
+import { app, protocol, BrowserWindow, ipcMain, Menu, Tray, nativeImage } from 'electron'
 import {
   createProtocol,
   installVueDevtools
 } from 'vue-cli-plugin-electron-builder/lib'
+require('events').EventEmitter.defaultMaxListeners = 15;
+const AutoLaunch = require('auto-launch');
+const settings = require('electron-settings');
+const ExpressApp = require('./ExpressApp')
+
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
 
+const gotTheLock = app.requestSingleInstanceLock()
+
+if (!gotTheLock) {
+  app.quit()
+  app.exit()
+} else {
+  app.on('second-instance', (event, commandLine, workingDirectory) => {
+    // Someone tried to run a second instance, we should focus our window.
+    if (win) {
+      if (win.isMinimized()) win.restore()
+      win.focus()
+    }
+  })
+}
 // Standard scheme must be registered before the app is ready
 protocol.registerStandardSchemes(['app'], { secure: true })
 function createWindow () {
@@ -74,3 +93,32 @@ if (isDevelopment) {
     })
   }
 }
+
+/*
+ Bypass Cors configuration.
+*/
+
+let expressServer
+
+app.on('ready', () => {
+  if (!settings.has('expressServerSettings')) {
+    settings.set('expressServerSettings', {
+      port: '3167',
+      whitelistDomains: []
+    });
+  }
+  let { port, whitelistDomains } = settings.get('expressServerSettings')
+  expressServer = ExpressApp(port, whitelistDomains)
+})
+
+ipcMain.on('restartExpressServer', (event, expressServerSettings) => {
+  settings.set('expressServerSettings', expressServerSettings)
+  if (expressServer) expressServer.close();
+  expressServer = ExpressApp(expressServerSettings.port, expressServerSettings.whitelistDomains)
+  win.webContents.send('expressServerSettings', expressServerSettings)
+})
+
+ipcMain.on('getExpressServerSettings', (event) => {
+  let expressServerSettings = settings.get('expressServerSettings')
+  win.webContents.send('expressServerSettings', expressServerSettings)
+})

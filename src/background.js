@@ -34,7 +34,7 @@ if (!gotTheLock) {
 protocol.registerStandardSchemes(['app'], { secure: true })
 function createWindow () {
   // Create the browser window.
-  win = new BrowserWindow({ width: 800, height: 680 })
+  win = new BrowserWindow({ width: 800, height: 720 })
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
@@ -44,8 +44,6 @@ function createWindow () {
     // Load the index.html when not in development
     win.loadURL('app://./index.html')
   }
-
-  win.webContents.on('did-finish-load', winIsReady)
 
   win.on('closed', () => {
     win = null
@@ -123,17 +121,25 @@ bypassCorsAutoLauncher.isEnabled()
 
 let expressServer
 
-function winIsReady () {
-  console.log('Window is ready!')
-  if (!settings.has('expressServerSettings')) {
-    settings.set('expressServerSettings', {
-      port: '3167',
-      whitelistDomains: []
-    });
-  }
-  let expressServerSettings = settings.get('expressServerSettings')
-  restartExpressServer(expressServerSettings)
+if (!settings.has('expressServerSettings')) {
+  settings.set('expressServerSettings', {
+    port: '3167',
+    whitelistDomains: []
+  });
 }
+
+let expressServerSettings = settings.get('expressServerSettings')
+
+ipcMain.on('restartExpressServer', (event, expressServerSettings) => {
+  settings.set('expressServerSettings', expressServerSettings)
+  restartExpressServer(expressServerSettings)
+  win.webContents.send('expressServerSettings', expressServerSettings)
+})
+
+ipcMain.on('getExpressServerSettings', (event) => {
+  let expressServerSettings = settings.get('expressServerSettings')
+  win.webContents.send('expressServerSettings', expressServerSettings)
+})
 
 function restartExpressServer (expressServerSettings) {
   if (expressServer) expressServer.close();
@@ -150,18 +156,7 @@ function restartExpressServer (expressServerSettings) {
   expressServer.on('success', success)
 
   function success () {
-    console.log('main process received success message!')
+    // console.log('main process received success message!')
     win.webContents.send('expressServerSuccess')
   };
 }
-
-ipcMain.on('restartExpressServer', (event, expressServerSettings) => {
-  settings.set('expressServerSettings', expressServerSettings)
-  restartExpressServer(expressServerSettings)
-  win.webContents.send('expressServerSettings', expressServerSettings)
-})
-
-ipcMain.on('getExpressServerSettings', (event) => {
-  let expressServerSettings = settings.get('expressServerSettings')
-  win.webContents.send('expressServerSettings', expressServerSettings)
-})

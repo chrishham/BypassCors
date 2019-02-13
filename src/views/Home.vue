@@ -1,5 +1,6 @@
 <template lang="pug">
 .container-fluid
+  loading-modal(v-if="isLoading" :status="loadingStatus")
   .row
     .col-md-6.offset-md-3
       h1 Bypass Cors
@@ -40,9 +41,11 @@
 <script>
 // @ is an alias to /src
 import { ipcRenderer } from "electron";
+import LoadingModal from "@/components/LoadingModal.vue";
 const opn = require("opn");
 
 export default {
+  components: { LoadingModal },
   data() {
     return {
       port: 0,
@@ -51,7 +54,9 @@ export default {
       behindProxy: false,
       proxy: "",
       serverIsUp: false,
-      errorMessage: ""
+      errorMessage: "",
+      isLoading: false,
+      loadingStatus: ""
     };
   },
   watch: {
@@ -71,7 +76,16 @@ export default {
   },
   created() {
     let self = this;
-
+    this.isLoading = true;
+    this.loadingStatus = "Restarting server"
+    // one time only: when client gets the settings for the first time 
+    // then start express server
+    ipcRenderer.once(
+      "expressServerSettings",
+      (event, expressServerSettings) => {
+        ipcRenderer.send("restartExpressServer", expressServerSettings);
+      }
+    );
     ipcRenderer.on("expressServerSettings", (event, expressServerSettings) => {
       console.log(expressServerSettings);
       let {
@@ -93,6 +107,8 @@ export default {
   },
   methods: {
     restartServer() {
+      this.isLoading = true;
+      this.loadingStatus = "Restarting server";
       let whitelistDomains = this.whitelistDomainsTextarea
         .split("\n")
         .filter(el => el);
@@ -108,25 +124,27 @@ export default {
       ipcRenderer.send("getExpressServerSettings");
     },
     expressServerError(event, message) {
-      // this.$notify({
-      //   message,
-      //   type: "danger",
-      //   timeout: 5000,
-      //   horizontalAlign: "center",
-      //   verticalAlign: "top"
-      // });
+      this.$notify({
+        message,
+        type: "danger",
+        timeout: 5000,
+        horizontalAlign: "center",
+        verticalAlign: "top"
+      });
       this.serverIsUp = false;
       this.errorMessage = message;
+      this.isLoading = false;
     },
     expressServerSuccess(event, message) {
-      // this.$notify({
-      //   message: "Server restart: Success!",
-      //   type: "success",
-      //   timeout: 5000,
-      //   horizontalAlign: "center",
-      //   verticalAlign: "top"
-      // });
+      this.$notify({
+        message: "Server restart: Success!",
+        type: "success",
+        timeout: 5000,
+        horizontalAlign: "center",
+        verticalAlign: "top"
+      });
       this.serverIsUp = true;
+      this.isLoading = false;
     },
     open(url) {
       opn(url);
@@ -144,6 +162,7 @@ export default {
 textarea {
   width: 100%;
   min-height: 200px;
+  resize: none;
 }
 
 .settings {

@@ -2,6 +2,7 @@ const request = require('request-promise')
 const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
+const ip = require('ip');
 
 // let test = express()
 // test.listen(3167, () => console.log(`Test server listening on port ${3167}!`))
@@ -35,10 +36,16 @@ module.exports = function (expressServerSettings) {
       .catch(error => res.send(error))
   })
 
-  expressServer = app.listen(port, () => {
+  // let myIp = ip.address()
+  expressServer = app.listen(port,() => {
     console.log(`ByPass CORS listening on port ${port}!`)
+    // console.log('My ip address : ', '0.0.0.0')
     // check internet connection
-    request({ url: 'https://www.google.com/', gzip: true, proxy: behindProxy ? proxy : false })
+    let googleRequest = request({ url: 'https://www.google.com/', gzip: true, proxy: behindProxy ? proxy : false })
+    let promiseTimeout = new Promise((resolve, reject) => {
+      setTimeout(() => reject('err'), 5000);
+    });
+    Promise.race([googleRequest, promiseTimeout])
       .then(response => expressServer.emit('success'))
       .catch(error => expressServer.emit('error', new Error('No access to the internet. Check your network/proxy settings and try again.')))
   })

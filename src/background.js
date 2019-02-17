@@ -5,10 +5,11 @@ import {
   createProtocol,
   installVueDevtools
 } from 'vue-cli-plugin-electron-builder/lib'
+import { ExpressApp } from './ExpressApp'
 require('events').EventEmitter.defaultMaxListeners = 15;
 const AutoLaunch = require('auto-launch');
 const settings = require('electron-settings');
-const ExpressApp = require('./ExpressApp')
+
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 

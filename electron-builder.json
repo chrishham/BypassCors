@@ -1,0 +1,12 @@
+{
+  "productName": "Bypass Cors",
+  "extraFiles": [
+    {
+      "from": "build/images",
+      "to": "resources",
+      "filter": [
+        "**/*"
+      ]
+    }
+  ]
+}

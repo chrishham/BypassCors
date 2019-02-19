@@ -3,7 +3,8 @@
   loading-modal(v-if="isLoading" :status="loadingStatus")
   .row
     .col-md-6.offset-md-3
-      h1 Bypass Cors
+      h1.mb-0 Bypass Cors
+        img.ml-3.logo(src="@/assets/icon_128x128.png")
       .status
         section(v-if="serverIsUp")
           span.green.dot(title="Bypass Cors Server is up!")
@@ -77,8 +78,8 @@ export default {
   created() {
     let self = this;
     this.isLoading = true;
-    this.loadingStatus = "Restarting server"
-    // one time only: when client gets the settings for the first time 
+    this.loadingStatus = "Restarting server";
+    // one time only: when client gets the settings for the first time
     // then start express server
     ipcRenderer.once(
       "expressServerSettings",
@@ -192,6 +193,9 @@ button {
 }
 #proxy {
   width: 80%;
+}
+.logo {
+  width: 50px;
 }
 </style>
 

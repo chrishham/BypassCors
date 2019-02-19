@@ -1,11 +1,14 @@
 {
-  "name": "bypass-cors-vue",
+  "name": "bypass-cors",
+  "description": "Unlock browser's full potential!",
   "version": "0.1.0",
+  "author": "Christopher Chamaletsos",
+  "repository": "https://github.com/chrishham/BypassCors",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "electron:build": "vue-cli-service electron:build",
+    "electron:build": "NO_PROXY=* vue-cli-service electron:build --config electron-builder.json",
     "electron:serve": "vue-cli-service electron:serve",
     "postinstall": "electron-builder install-app-deps"
   },
@@ -15,6 +18,7 @@
     "bootstrap-vue": "^2.0.0-rc.11",
     "cors": "^2.8.5",
     "electron-settings": "^3.2.0",
+    "electron-updater": "^4.0.6",
     "jquery": "^3.3.1",
     "opn": "^5.4.0",
     "request": "^2.88.0",

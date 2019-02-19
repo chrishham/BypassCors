@@ -7,9 +7,10 @@ import {
 } from 'vue-cli-plugin-electron-builder/lib'
 import { ExpressApp } from './ExpressApp'
 require('events').EventEmitter.defaultMaxListeners = 15;
+const path = require('path')
 const AutoLaunch = require('auto-launch');
+const { autoUpdater } = require("electron-updater")
 const settings = require('electron-settings');
-
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -33,9 +34,22 @@ if (!gotTheLock) {
 }
 // Standard scheme must be registered before the app is ready
 protocol.registerStandardSchemes(['app'], { secure: true })
+
 function createWindow () {
   // Create the browser window.
-  win = new BrowserWindow({ width: 800, height: 720 })
+  const iconPath = isDevelopment ? path.join('build', 'images', 'icon_512x512@2x.png')
+    : path.join(process.resourcesPath, 'icon_512x512@2x.png')
+  console.log('iconPath', iconPath)
+  win = new BrowserWindow({
+    width: 800,
+    height: 720,
+    icon: iconPath
+  })
+  win.setTitle(require('../electron-builder.json').productName + ' v' + require('../package.json').version)
+  win.on('page-title-updated', (event, title) => {
+    event.preventDefault()
+    console.log(title)
+  })
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode
     win.loadURL(process.env.WEBPACK_DEV_SERVER_URL)
@@ -45,19 +59,15 @@ function createWindow () {
     // Load the index.html when not in development
     win.loadURL('app://./index.html')
   }
-
-  win.on('closed', () => {
-    win = null
+  win.on('close', (event) => {
+    event.preventDefault()
+    win.hide()
   })
 }
 
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
-  // On macOS it is common for applications and their menu bar
-  // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
+  app.quit()
 })
 
 app.on('activate', () => {
@@ -93,13 +103,38 @@ if (isDevelopment) {
     })
   }
 }
-
+/*
+* Tray configuration
+*/
+let tray = null
+app.on('ready', () => {
+  const imgPath = isDevelopment ? path.join('build', 'images', 'icon_16x16@2x.png')
+    : path.join(process.resourcesPath, 'icon_16x16@2x.png')
+  let trayImage = nativeImage.createFromPath(imgPath)
+  tray = new Tray(trayImage)
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      label: 'Show App', click: function () {
+        win.show()
+      }
+    },
+    {
+      label: 'Quit', click: function () {
+        app.isQuiting = true
+        app.quit()
+        app.exit()
+      }
+    }
+  ])
+  tray.setToolTip('Bypass CORS')
+  tray.setContextMenu(contextMenu)
+})
 /*
  Enable Bypass Cors to start at startup
  */
 var bypassCorsAutoLauncher = new AutoLaunch({
   name: 'Bypass Cors',
-  path: '/Applications/bypass-cors.app',
+  path: '/Applications/Bypass Cors.app',
 });
 
 bypassCorsAutoLauncher.enable();

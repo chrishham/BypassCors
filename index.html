@@ -7,6 +7,7 @@
   <script src='https://unpkg.com/vue'></script>
   <link rel="shortcut icon" href="github_pages/favicon.ico" type="image/x-icon">
   <link rel="icon" href="github_pages/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.5.0/themes/prism.min.css">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
   <link rel="stylesheet" href="github_pages/index.css">
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
@@ -15,55 +16,101 @@
 <body>
   <div id='app'>
     <div class="container-fluid">
-      <div class="row text-center">
+      <header class="text-center">
+        <h1>Bypass Cors
+          <img src="github_pages/icon_16x16@2x.png" alt="Bypass CORS logo">
+        </h1>
+        <p>Adding Horsepower to Web Apps!</p>
+      </header>
+      <div class="row">
+        <div class="col-md-2 col-sm-12" id="right-navbar">
+          <ul class="nav flex-column">
+            <li class="nav-item">
+              <a class="nav-link" href="#">Page Top</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#introduction">Introduction</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#usage">Usage</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link active" href="#installation">Installation</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link disabled" href="#">Item 4</a>
+            </li>
+          </ul>
+        </div>
         <div class="offset-md-2 col-md-8 offset-lg-3 col-lg-6">
-          <h1>Bypass Cors
-            <img src="github_pages/icon_16x16@2x.png" alt="Bypass CORS logo">
-          </h1>
-          <p>Adding Horsepower to Web Apps!</p>
-          <h2 id="installation">Installation</h2>
+          <h2 id="introduction" class="text-center">Introduction</h2>
+          <img src="github_pages/Bypass_CORS.png" class="img-fluid" alt="Bypass Cors Explained">
+          <p> NEVER again let not enabled CORS domains , stand in your Web App's way to acquiring
+            publicly available web resources.
+          </p>
+          <h2 id="usage" class="text-center">Usage</h2>
+          <p><b>Three steps:</b></p>
+          <ol>
+            <li>Prod your users to install Bypass Cors to their machines.</li>
+            <li>Tell them to add your domain to Bypass Cors's '"Whitelist Domains", e.g. "https://example.com/".
+              For the change to take effect they have to press the "Restart Server" button.
+            </li>
+            <li>Issue an http POST request from your web app,  to the url Bypass Cors is listening at.
+              Default address is http://localhost:3167/, but user can change the port.
+              <pre><code class="language-javascript">
+axios
+  .post(bypassCorsUrl, 
+    { headers, url, fullPageRender, javascript, scrollInterval, debug })
+  .then(res => res.data)</code>
+              </pre>
+
+            </li>
+          </ol>
+          <h2 id="installation" class="text-center">Installation</h2>
           <p class="text-left">
             <b>Step 1:</b>
             Download the appropriate installer for your machine:
           </p>
-          <button class="btn btn-primary mb-4">
-            <a :href="latestReleaseBaseUrl + windowsInstaller">
-              <img class="logo" src="github_pages/WindowsLogo.png" alt="Windows Logo"> Windows
-            </a>
-          </button>
-          <button class="btn btn-info mb-4 ml-4 ">
-            <a :href="latestReleaseBaseUrl + macInstaller">
-              <img class="logo" src="github_pages/MacLogo.png" alt="Mac Logo"> Mac
-            </a>
-          </button>
-          <button class="btn btn-success mb-4 ml-4">
-            <a :href="latestReleaseBaseUrl + linuxInstaller">
-              <img class="logo linux" src="github_pages/LinuxLogo.png" alt="Linux Logo"> Linux
-            </a>
-          </button>
+          <section class="text-center">
+            <button class="btn btn-primary mb-4">
+              <a :href="latestReleaseBaseUrl + windowsInstaller">
+                <img class="logo" src="github_pages/WindowsLogo.png" alt="Windows Logo"> Windows
+              </a>
+            </button>
+            <button class="btn btn-info mb-4 ml-4 ">
+              <a :href="latestReleaseBaseUrl + macInstaller">
+                <img class="logo" src="github_pages/MacLogo.png" alt="Mac Logo"> Mac
+              </a>
+            </button>
+            <button class="btn btn-success mb-4 ml-4">
+              <a :href="latestReleaseBaseUrl + linuxInstaller">
+                <img class="logo linux" src="github_pages/LinuxLogo.png" alt="Linux Logo"> Linux
+              </a>
+            </button>
+          </section>
           <p class="text-left">
             <b>Step 2:</b>
             Follow the instructions specific to your os :
           </p>
           <ul class="nav nav-tabs">
             <li class="nav-item">
-              <a class="nav-link" href="#" @click="osActive='Windows'"
+              <a class="nav-link" href="#" @click.prevent="osActive='Windows'"
                 :class="{ active: osActive==='Windows' }">Windows</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#" @click="osActive='Mac'" :class="{ active: osActive==='Mac' }">Mac</a>
+              <a class="nav-link" href="#" @click.prevent="osActive='Mac'" :class="{ active: osActive==='Mac' }">Mac</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#" @click="osActive='Linux'" :class="{ active: osActive==='Linux' }">Linux</a>
+              <a class="nav-link" href="#" @click.prevent="osActive='Linux'"
+                :class="{ active: osActive==='Linux' }">Linux</a>
             </li>
           </ul>
           <div class="text-left">
             <section v-if="osActive==='Windows'">
               <p class="mt-3"><b> 1.</b>Double-click the downloaded <b> {{windowsInstaller}} </b>.</p>
-              <p class="mt-3"><b> 2.</b>You may run into the following warning message, initiated from <b>"Windows
-                  Defender
-                  Smartscreen" </b>: </p>
-              <img src="github_pages/WindowsDefender1.png" alt="WindowsDefenderFirstScreen">
+              <p class="mt-3"><b> 2.</b>You may run into the following warning message, initiated from
+                <b>"Windows Defender Smartscreen" </b>: </p>
+              <img src="github_pages/WindowsDefender1.png" class="img-fluid" alt="WindowsDefenderFirstScreen">
               <p class="mt-2">Click at <b>"More info" </b>.</p>
               <p> When the warning message expands, click the <b>“Run anyway” </b> button</p>
               <p class="mt-3"><b> 3.</b>When installation completes , the <b>"Windows Defender Firewall"</b> will ask
@@ -72,19 +119,28 @@
             <section v-if="osActive==='Mac'">
               <p class="mt-3"><b> 1.</b>Double-click the downloaded <b> {{macInstaller}} </b>.</p>
               <p class="mt-3"><b> 2.</b>Drag and drop the Bypass Cors icon to the application's folder.</p>
-              <img src="github_pages/MacInstall.png" class="macInstall" alt="MacInstall">
+              <img src="github_pages/MacInstall.png" class="macInstall img-fluid" alt="MacInstall">
+              <p class="mt-3"><b> 3.</b>When you launch the app for the first time, you may get the message:
+                "You cannot open an app from an unidentified developer" . To proceed locate the installed Bypass Cors
+                app in the Finder (under Applications Folder),
+                right-click it and select "Open". More detailed instructions can be found <a
+                  href="https://support.apple.com/kb/ph25088?locale=en_US" target="_blank"> here</a>.
+              </p>
             </section>
             <section v-if="osActive==='Linux'">
-              <p class="mt-3"><b> 1.</b> <b> {{linuxInstaller}} :</b>
-                Right-Click => Properties => Permissions => Execute => Allow executing file as program =>
+              <p class="mt-3"><b> 1.</b>
+                Right-Click the downloaded <b> {{linuxInstaller}} </b> => Properties => Permissions => Execute => Allow
+                executing file as program =>
                 <u>tick the checkbox</u>.</p>
-              <p class="mt-3"><b> 2.</b><b> {{linuxInstaller}} : </b> Double-click. You can install or run as a standalone.</p>
+              <p class="mt-3"><b> 2.</b>Double-click the installer. You can choose to run as a standalone( no
+                installation).</p>
             </section>
           </div>
         </div>
       </div>
     </div>
   </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.5.0/prism.min.js"></script>
   <script>
     var app = new Vue({
       el: '#app',

@@ -15,3 +15,14 @@ button a {
 .macInstall {
   height: 250px;
 }
+
+#right-navbar {
+  position: fixed;
+  top: 50px;
+}
+
+@media (max-width: 767px) {
+  #right-navbar {
+    position: static;
+  }
+}

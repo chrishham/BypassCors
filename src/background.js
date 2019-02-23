@@ -65,6 +65,9 @@ function createWindow () {
   })
 }
 
+app.on('ready', function () {
+  autoUpdater.checkForUpdatesAndNotify();
+});
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
   app.quit()

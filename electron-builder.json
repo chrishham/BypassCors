@@ -1,5 +1,7 @@
 {
   "productName": "Bypass Cors",
+  "asar": true,
+  "appId": "com.github.chrishham.BypassCors",
   "extraFiles": [
     {
       "from": "build/images",
@@ -8,5 +10,25 @@
         "**/*"
       ]
     }
-  ]
+  ],
+  "publish": {
+    "provider": "github",
+    "mac": {
+      "target": "dmg"
+    },
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "ia32"
+          ]
+        }
+      ]
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  }
 }

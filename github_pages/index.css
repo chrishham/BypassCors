@@ -1,0 +1,17 @@
+.logo {
+  width: 25px;
+}
+
+.logo.linux {
+  width: 35px;
+}
+
+button a {
+  color: white;
+  text-decoration: none;
+  /* no underline */
+}
+
+.macInstall {
+  height: 250px;
+}

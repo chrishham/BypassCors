@@ -1,6 +1,6 @@
 {
   "name": "bypass-cors",
-  "description": "Unlock browser's full potential!",
+  "description": "Adding Horsepower to Web Apps!",
   "version": "0.1.0",
   "author": "Christopher Chamaletsos",
   "repository": "https://github.com/chrishham/BypassCors",
@@ -10,7 +10,8 @@
     "build": "vue-cli-service build",
     "electron:build": "NO_PROXY=* vue-cli-service electron:build --config electron-builder.json",
     "electron:serve": "vue-cli-service electron:serve",
-    "postinstall": "electron-builder install-app-deps"
+    "postinstall": "electron-builder install-app-deps",
+    "release": "NO_PROXY=* vue-cli-service electron:build --windows nsis --linux AppImage --mac dmg --config electron-builder.json -p always"
   },
   "dependencies": {
     "auto-launch": "^5.0.5",

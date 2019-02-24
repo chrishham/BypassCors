@@ -37,8 +37,8 @@ protocol.registerStandardSchemes(['app'], { secure: true })
 
 function createWindow () {
   // Create the browser window.
-  const iconPath = isDevelopment ? path.join('build', 'images', 'icon_512x512@2x.png')
-    : path.join(process.resourcesPath, 'icon_512x512@2x.png')
+  const iconPath = isDevelopment ? path.join('build', 'images', 'icon_32x32@2x.png')
+    : path.join(process.resourcesPath, 'icon_32x32@2x.png')
   console.log('iconPath', iconPath)
   win = new BrowserWindow({
     width: 800,

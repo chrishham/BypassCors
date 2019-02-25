@@ -27,8 +27,7 @@ if (!gotTheLock) {
   app.on('second-instance', (event, commandLine, workingDirectory) => {
     // Someone tried to run a second instance, we should focus our window.
     if (win) {
-      if (win.isMinimized()) win.restore()
-      win.focus()
+      win.show()
     }
   })
 }
@@ -37,8 +36,9 @@ protocol.registerStandardSchemes(['app'], { secure: true })
 
 function createWindow () {
   // Create the browser window.
-  const iconPath = isDevelopment ? path.join('build', 'images', 'icon_32x32@2x.png')
-    : path.join(process.resourcesPath, 'icon_32x32@2x.png')
+  let iconFileName = process.platform === 'linux' ? 'icon_16x16.png' : 'icon_32x32@2x.png'
+  const iconPath = isDevelopment ? path.join('build', 'images', iconFileName)
+    : path.join(process.resourcesPath, iconFileName)
   console.log('iconPath', iconPath)
   win = new BrowserWindow({
     width: 800,
@@ -60,6 +60,10 @@ function createWindow () {
     win.loadURL('app://./index.html')
   }
   win.on('close', (event) => {
+    event.preventDefault()
+    win.hide()
+  })
+  win.on('minimize', function (event) {
     event.preventDefault()
     win.hide()
   })
@@ -111,8 +115,9 @@ if (isDevelopment) {
 */
 let tray = null
 app.on('ready', () => {
-  const imgPath = isDevelopment ? path.join('build', 'images', 'icon_16x16@2x.png')
-    : path.join(process.resourcesPath, 'icon_16x16@2x.png')
+  let iconFileName = process.platform === 'linux' ? 'icon_16x16.png' : 'icon_16x16@2x.png'
+  const imgPath = isDevelopment ? path.join('build', 'images', iconFileName)
+    : path.join(process.resourcesPath, iconFileName)
   let trayImage = nativeImage.createFromPath(imgPath)
   tray = new Tray(trayImage)
   const contextMenu = Menu.buildFromTemplate([
@@ -131,13 +136,15 @@ app.on('ready', () => {
   ])
   tray.setToolTip('Bypass CORS')
   tray.setContextMenu(contextMenu)
+  tray.on('click', () => {
+    win.show()
+  })
 })
 /*
  Enable Bypass Cors to start at startup
  */
 var bypassCorsAutoLauncher = new AutoLaunch({
-  name: 'Bypass Cors',
-  path: '/Applications/Bypass Cors.app',
+  name: 'Bypass Cors'
 });
 
 bypassCorsAutoLauncher.enable();

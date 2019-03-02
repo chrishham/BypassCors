@@ -8,7 +8,7 @@
       .status
         section(v-if="serverIsUp")
           span.green.dot(title="Bypass Cors Server is up!")
-          a(href='#' @click.prevent="open('http://localhost:' + runningPort)") http://localhost:{{runningPort}}
+          a(href='#' @click.prevent="open('http://localhost:' + runningPort)" @auxclick.prevent="") http://localhost:{{runningPort}}
           b-alert.mt-2(variant="success" show) Bypass Cors Server is up!
         section(v-else)
           span.red.dot 

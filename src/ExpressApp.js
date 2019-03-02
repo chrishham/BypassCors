@@ -30,7 +30,7 @@ function ExpressApp (expressServerSettings) {
     if (!/^http(s)?:\/\/localhost:/.test(origin)) debug = false
     if (!url) return res.status(500).send('Url is required!')
     if (!headers) return res.status(500).send('Headers are required!')
-    
+
     if (fullPageRender) return newBrowserWindow({ headers, url, javascript, scrollInterval, debug })
       .then(response => res.send(response))
       .catch(error => {
@@ -63,6 +63,10 @@ function newBrowserWindow ({ headers, url, javascript, scrollInterval, debug }) 
     let win = new BrowserWindow({
       width: 1000,
       height: 1000,
+      webPreferences: {
+        nodeIntegration: false,
+        contextIsolation: true
+      },
       show: !!debug
     })
     let userAgent = headers['user-agent']
@@ -73,7 +77,7 @@ function newBrowserWindow ({ headers, url, javascript, scrollInterval, debug }) 
         extraHeaders += headerName + ':' + headers[headerName] + '\n'
       }
     }
-
+    const ses = win.webContents.session
     win.webContents.openDevTools()
     win.loadURL(url, {
       userAgent,
@@ -104,7 +108,30 @@ function newBrowserWindow ({ headers, url, javascript, scrollInterval, debug }) 
             })
           })()
         `)
-          .then(result => resolve(result))
+          .then(result => {
+            ses.cookies.get({}, (error, cookies) => {
+              console.log('cookies.length', cookies.length)
+              if (error) return reject(error)
+              cookies.forEach(cookie => {
+                const scheme = cookie.secure ? "https" : "http";
+                const host = cookie.domain[0] === "." ? cookie.domain.substr(1) : cookie.domain;
+                cookie.url = scheme + "://" + host;
+                ses.cookies.set(cookie, setCookieCb)
+              })
+              let cbCntr = 0
+              function setCookieCb (error) {
+                if (error) {
+                  console.log(cbCntr, error)
+                  return reject(error)
+                }
+                cbCntr++
+                if (cbCntr === cookies.length) {
+                  console.log('Finished adding cookies to session!')
+                  resolve(result)
+                }
+              }
+            })
+          })
         )
         .catch(error => {
           reject(error)

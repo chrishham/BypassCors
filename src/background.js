@@ -39,7 +39,7 @@ function createWindow () {
   let iconFileName = process.platform === 'linux' ? 'icon_16x16.png' : 'icon_32x32@2x.png'
   const iconPath = isDevelopment ? path.join('build', 'images', iconFileName)
     : path.join(process.resourcesPath, iconFileName)
-  console.log('iconPath', iconPath)
+  // console.log('iconPath', iconPath)
   win = new BrowserWindow({
     width: 800,
     height: 720,
@@ -48,7 +48,7 @@ function createWindow () {
   win.setTitle(require('../electron-builder.json').productName + ' v' + require('../package.json').version)
   win.on('page-title-updated', (event, title) => {
     event.preventDefault()
-    console.log(title)
+    // console.log(title)
   })
   if (process.env.WEBPACK_DEV_SERVER_URL) {
     // Load the url of the dev server if in development mode

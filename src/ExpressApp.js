@@ -39,7 +39,7 @@ function ExpressApp (expressServerSettings) {
       })
 
     const cookieJar = request.jar()
-    if (cookies) setRequestCookies(cookies, cookieJar)
+    if (cookies) setRequestCookies(cookies, cookieJar, url)
 
     let gzip = headers['Accept-Encoding'] && headers['Accept-Encoding'].indexOf('gzip') !== -1 ? true : false
     request({ url, headers, gzip, proxy: behindProxy ? proxy : false, jar: cookieJar })
@@ -124,7 +124,6 @@ function newBrowserWindow ({ headers, url, javascript, scrollInterval, debug, co
         `)
           .then(html => {
             ses.cookies.get({}, (error, cookies) => {
-              console.log('Electron cookies.length: ', cookies.length)
               if (error) return reject(error)
               resolve({ html, cookies })
               ses.clearStorageData()
@@ -155,7 +154,6 @@ function timeOutReject (t) {
 function setElectronCookies (cookies, ses) {
   return new Promise((resolve, reject) => {
     cookies = cookies.filter(cookie => cookie.key || cookie.name)
-    console.log('Request cookies.length: ', cookies.length)
     cookies.forEach(cookie => {
       if (cookie.key) {
         cookie.name = cookie.key
@@ -174,23 +172,20 @@ function setElectronCookies (cookies, ses) {
       }
       cbCntr++
       if (cbCntr === cookies.length) {
-        console.log('Finished adding cookies to session!')
         resolve()
       }
     }
   })
 }
 
-function setRequestCookies (cookies, cookieJar) {
+function setRequestCookies (cookies, cookieJar, url) {
   cookies.forEach(cookie => {
     if (cookie.name) {
       cookie.key = cookie.name
       delete cookie.name
     }
-    const scheme = cookie.secure ? "https" : "http";
-    const host = cookie.domain[0] === "." ? cookie.domain.substr(1) : cookie.domain;
-    const url = scheme + "://" + host;
-    cookieJar.setCookie(cookie.toString(), url)
+    const requestCookie = request.cookie(`${cookie.key}=${cookie.value}`);
+    cookieJar.setCookie(requestCookie, url);
   })
 }
 

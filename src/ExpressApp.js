@@ -25,22 +25,28 @@ function ExpressApp (expressServerSettings) {
   app.get('/', (req, res) => res.send('Bypass CORS is up and running!'))
 
   app.post('/', (req, res) => {
-    let { headers, url, fullPageRender, javascript, scrollInterval, debug } = req.body
+    let { headers, url, fullPageRender, javascript, scrollInterval, debug, cookies } = req.body
     let origin = req.get('origin');
     if (!/^http(s)?:\/\/localhost:/.test(origin)) debug = false
     if (!url) return res.status(500).send('Url is required!')
     if (!headers) return res.status(500).send('Headers are required!')
 
-    if (fullPageRender) return newBrowserWindow({ headers, url, javascript, scrollInterval, debug })
+    if (fullPageRender) return newBrowserWindow({ headers, url, javascript, scrollInterval, debug, cookies })
       .then(response => res.send(response))
       .catch(error => {
         // console.log(error.message)
         res.status(500).send(error.message)
       })
 
+    const cookieJar = request.jar()
+    if (cookies) setRequestCookies(cookies, cookieJar)
+
     let gzip = headers['Accept-Encoding'] && headers['Accept-Encoding'].indexOf('gzip') !== -1 ? true : false
-    request({ url, headers, gzip, proxy: behindProxy ? proxy : false })
-      .then(response => res.json(response))
+    request({ url, headers, gzip, proxy: behindProxy ? proxy : false, jar: cookieJar })
+      .then(html => {
+        cookies = cookieJar ? cookieJar.getCookies(url) : null
+        res.json({ html, cookies })
+      })
       .catch(error => res.status(500).send(error))
   })
 
@@ -57,7 +63,7 @@ function ExpressApp (expressServerSettings) {
   return expressServer
 }
 
-function newBrowserWindow ({ headers, url, javascript, scrollInterval, debug }) {
+function newBrowserWindow ({ headers, url, javascript, scrollInterval, debug, cookies }) {
   scrollInterval = scrollInterval || 500
   return new Promise((resolve, reject) => {
     let win = new BrowserWindow({
@@ -77,12 +83,20 @@ function newBrowserWindow ({ headers, url, javascript, scrollInterval, debug }) 
         extraHeaders += headerName + ':' + headers[headerName] + '\n'
       }
     }
-    const ses = win.webContents.session
     win.webContents.openDevTools()
-    win.loadURL(url, {
-      userAgent,
-      extraHeaders
-    })
+    const ses = win.webContents.session
+    Promise.resolve()
+      .then(() => {
+        if (cookies) return setElectronCookies(cookies, ses)
+      })
+      .then(() => {
+        win.loadURL(url, {
+          userAgent,
+          extraHeaders
+        })
+      })
+      .catch(error => reject(error))
+
     win.webContents.once('did-finish-load', () => {
       javascript = `(function(){
         ${javascript}
@@ -108,28 +122,12 @@ function newBrowserWindow ({ headers, url, javascript, scrollInterval, debug }) 
             })
           })()
         `)
-          .then(result => {
+          .then(html => {
             ses.cookies.get({}, (error, cookies) => {
-              console.log('cookies.length', cookies.length)
+              console.log('Electron cookies.length: ', cookies.length)
               if (error) return reject(error)
-              cookies.forEach(cookie => {
-                const scheme = cookie.secure ? "https" : "http";
-                const host = cookie.domain[0] === "." ? cookie.domain.substr(1) : cookie.domain;
-                cookie.url = scheme + "://" + host;
-                ses.cookies.set(cookie, setCookieCb)
-              })
-              let cbCntr = 0
-              function setCookieCb (error) {
-                if (error) {
-                  console.log(cbCntr, error)
-                  return reject(error)
-                }
-                cbCntr++
-                if (cbCntr === cookies.length) {
-                  console.log('Finished adding cookies to session!')
-                  resolve(result)
-                }
-              }
+              resolve({ html, cookies })
+              ses.clearStorageData()
             })
           })
         )
@@ -151,6 +149,48 @@ function timeOutReject (t) {
     setTimeout(() => {
       reject(new Error('Javascript execution timeout.'))
     }, t)
+  })
+}
+
+function setElectronCookies (cookies, ses) {
+  return new Promise((resolve, reject) => {
+    cookies = cookies.filter(cookie => cookie.key || cookie.name)
+    console.log('Request cookies.length: ', cookies.length)
+    cookies.forEach(cookie => {
+      if (cookie.key) {
+        cookie.name = cookie.key
+        delete cookie.key
+      }
+      const scheme = cookie.secure ? "https" : "http";
+      const host = cookie.domain[0] === "." ? cookie.domain.substr(1) : cookie.domain;
+      cookie.url = scheme + "://" + host;
+      ses.cookies.set(cookie, setCookieCb)
+    })
+    let cbCntr = 0
+    function setCookieCb (error) {
+      if (error) {
+        console.log(cbCntr, error)
+        return reject(error)
+      }
+      cbCntr++
+      if (cbCntr === cookies.length) {
+        console.log('Finished adding cookies to session!')
+        resolve()
+      }
+    }
+  })
+}
+
+function setRequestCookies (cookies, cookieJar) {
+  cookies.forEach(cookie => {
+    if (cookie.name) {
+      cookie.key = cookie.name
+      delete cookie.name
+    }
+    const scheme = cookie.secure ? "https" : "http";
+    const host = cookie.domain[0] === "." ? cookie.domain.substr(1) : cookie.domain;
+    const url = scheme + "://" + host;
+    cookieJar.setCookie(cookie.toString(), url)
   })
 }
 

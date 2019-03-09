@@ -25,11 +25,12 @@ function ExpressApp (expressServerSettings) {
   app.get('/', (req, res) => res.send('Bypass CORS is up and running!'))
 
   app.post('/', (req, res) => {
-    let { headers, url, fullPageRender, javascript, scrollInterval, debug, cookies } = req.body
+    let { headers, url, post, fullPageRender, javascript, scrollInterval, debug, cookies } = req.body
     let origin = req.get('origin');
     if (!/^http(s)?:\/\/localhost:/.test(origin)) debug = false
     if (!url) return res.status(500).send('Url is required!')
     if (!headers) return res.status(500).send('Headers are required!')
+    if (post && fullPageRender) return res.status(500).send(`Can't combine post and fullPageRender`)
 
     if (fullPageRender) return newBrowserWindow({ headers, url, javascript, scrollInterval, debug, cookies })
       .then(response => res.send(response))
@@ -39,15 +40,38 @@ function ExpressApp (expressServerSettings) {
       })
 
     const cookieJar = request.jar()
-    if (cookies) setRequestCookies(cookies, cookieJar, url)
+    if (cookies && cookies.length > 0) setRequestCookies(cookies, cookieJar, url)
 
     let gzip = headers['Accept-Encoding'] && headers['Accept-Encoding'].indexOf('gzip') !== -1 ? true : false
-    request({ url, headers, gzip, proxy: behindProxy ? proxy : false, jar: cookieJar })
+
+    Promise.resolve()
+      .then(() => {
+        // console.log(headers)
+        if (post) return request.post({
+          url,
+          headers,
+          gzip,
+          form: post.form,
+          followRedirect: false,
+          proxy: behindProxy ? proxy : false,
+          jar: cookieJar
+        })
+        return request({
+          url,
+          headers,
+          gzip,
+          proxy: behindProxy ? proxy : false,
+          jar: cookieJar
+        })
+      })
       .then(html => {
         cookies = cookieJar ? cookieJar.getCookies(url) : null
         res.json({ html, cookies })
       })
-      .catch(error => res.status(500).send(error))
+      .catch(error => {
+        console.log(error)
+        res.status(500).send(error)
+      })
   })
 
   expressServer = app.listen(port, () => {

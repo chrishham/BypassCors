@@ -95,6 +95,7 @@ function newBrowserWindow ({ headers, url, javascript, scrollInterval, debug, co
       height: 1000,
       webPreferences: {
         nodeIntegration: false,
+        nodeIntegrationInWorker: false,
         contextIsolation: true
       },
       show: !!debug

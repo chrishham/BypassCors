@@ -11,6 +11,11 @@ const path = require('path')
 const AutoLaunch = require('auto-launch');
 const { autoUpdater } = require("electron-updater")
 const settings = require('electron-settings');
+const contextMenu = require('electron-context-menu');
+
+contextMenu({
+  prepend: (params, browserWindow) => []
+});
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 

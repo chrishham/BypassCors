@@ -27,3 +27,9 @@ button a {
     text-align: center;
   }
 }
+
+div.github {
+  position: fixed;
+  top: 0;
+  right: 0;
+}

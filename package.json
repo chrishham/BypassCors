@@ -16,7 +16,7 @@
   "dependencies": {
     "auto-launch": "^5.0.5",
     "babel-helper-vue-jsx-merge-props": "^2.0.3",
-    "bootstrap-vue": "^2.0.0-rc.11",
+    "bootstrap-vue": "^2.0.0",
     "cors": "^2.8.5",
     "electron-context-menu": "^0.11.0",
     "electron-settings": "^3.2.0",

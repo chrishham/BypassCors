@@ -78,7 +78,7 @@ function ExpressApp (expressServerSettings) {
     console.log(`ByPass CORS listening on port ${port}!`)
     let googleRequest = request({ url: 'https://www.google.com/', gzip: true, proxy: behindProxy ? proxy : false })
     let promiseTimeout = new Promise((resolve, reject) => {
-      setTimeout(() => reject('err'), 5000);
+      setTimeout(() => reject('err'), 10000);
     });
     Promise.race([googleRequest, promiseTimeout])
       .then(response => expressServer.emit('success'))

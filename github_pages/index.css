@@ -21,15 +21,49 @@ button a {
   top: 50px;
 }
 
-@media (max-width: 767px) {
-  #right-navbar {
-    position: static;
-    text-align: center;
-  }
-}
-
 div.github {
   position: fixed;
   top: 0;
   right: 0;
 }
+
+input.targetUrl {
+  width: 80%;
+}
+
+textarea.headersTxt {
+  min-height: 330px;
+  width: 100%;
+}
+
+textarea.cookiesTxt {
+  min-height: 330px;
+  width: 100%;
+}
+
+textarea.javascriptTxt {
+  min-height: 130px;
+  width: 100%;
+}
+
+.whatScraperSees {
+  width: 100%;
+  background-color: whitesmoke;
+  min-height: 80vh;
+  overflow-y: scroll;
+  border: 2px solid gold;
+}
+
+@media (max-width: 767px) {
+  #right-navbar {
+    position: static;
+    text-align: center;
+  }
+  div.github {
+    position: absolute;
+  }
+}
+
+/* div.installation {
+  min-height: 300px;
+} */

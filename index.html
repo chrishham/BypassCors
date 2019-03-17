@@ -21,53 +21,37 @@
             src="https://github.blog/wp-content/uploads/2008/12/forkme_right_darkblue_121621.png?resize=149%2C149"
             class="attachment-full size-full" alt="Fork me on GitHub" data-recalc-dims="1"></a>
       </div>
-      <header class="text-center">
-        <h1>Bypass Cors
-          <img src="github_pages/icon_16x16@2x.png" alt="Bypass CORS logo">
-        </h1>
-        <p>Adding Horsepower to Web Apps!</p>
-      </header>
       <div class="row">
         <div class="col-md-2 col-sm-12" id="right-navbar">
           <ul class="nav flex-column">
             <li class="nav-item">
-              <a class="nav-link" href="#">Page Top</a>
-            </li>
-            <li class="nav-item">
               <a class="nav-link" href="#introduction">Introduction</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#usage">Usage</a>
             </li>
             <li class="nav-item">
               <a class="nav-link active" href="#installation">Installation</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#usage">Instructions for Developers</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#demo">Demo</a>
+            </li>
           </ul>
         </div>
-        <div class="offset-md-2 col-md-8 offset-lg-3 col-lg-6">
+        <div class="offset-md-2 col-md-9 offset-lg-3 col-lg-7">
+          <header class="text-center">
+            <h1>Bypass Cors
+              <img src="github_pages/icon_16x16@2x.png" alt="Bypass CORS logo">
+            </h1>
+            <p>Adding Horsepower to Web Apps!</p>
+          </header>
+          <hr>
           <h2 id="introduction" class="text-center">Introduction</h2>
           <img src="github_pages/Bypass_CORS.png" class="img-fluid" alt="Bypass Cors Explained">
           <p> NEVER again let not enabled CORS domains , stand in your Web App's way to acquiring
-            publicly available web resources.
+            publicly available web resources !
           </p>
-          <h2 id="usage" class="text-center">Usage</h2>
-          <p><b>Three steps:</b></p>
-          <ol>
-            <li>Prod your users to install Bypass Cors to their machines.</li>
-            <li>Tell them to add your domain to Bypass Cors's '"Whitelist Domains", e.g. "https://example.com/".
-              For the change to take effect they have to press the "Restart Server" button.
-            </li>
-            <li>Issue an http POST request from your web app, to the url Bypass Cors is listening at.
-              Default address is http://localhost:3167/, but user can change the port.
-              <pre><code class="language-javascript">
-axios
-  .post(bypassCorsUrl, 
-    { headers, url, fullPageRender, javascript, scrollInterval, debug })
-  .then(res => res.data)</code>
-              </pre>
-
-            </li>
-          </ol>
+          <hr>
           <h2 id="installation" class="text-center">Installation</h2>
           <p class="text-left">
             <b>Step 1:</b>
@@ -107,7 +91,7 @@ axios
                 :class="{ active: osActive==='Linux' }">Linux</a>
             </li>
           </ul>
-          <div class="text-left">
+          <div class="text-left installation">
             <section v-if="osActive==='Windows'">
               <p class="mt-3"><b> 1.</b>Open the folder where <b> {{windowsInstaller}} </b> was saved. <em> Don't try to
                   run the installer directly from within your browser downloads section; it won't work.</em>
@@ -140,7 +124,182 @@ axios
                 installation).</p>
             </section>
           </div>
-        </div>
+          <hr>
+          <h2 id="usage" class="text-center">Instructions for Developers</h2>
+          <p><b>Three steps:</b></p>
+          <ol>
+            <li>Prod your users to install Bypass Cors to their machines.</li>
+            <li>Tell them to add your domain to Bypass Cors's '"Whitelist Domains", e.g. "https://example.com/".
+              For the change to take effect , they have to press the "Restart Server" button.
+            </li>
+            <li>Issue an http POST request from your web app, to the url Bypass Cors is listening at.
+              Default address is http://localhost:3167/, but user can change the port. Example below makes
+              use of the ES6 feature : <a href="http://es6-features.org/#PropertyShorthand" target="_blank"> property
+                shorthand.</a> All variables have to be declared & assigned values , beforehand.
+              <pre><code class="language-javascript">axios.post(
+  bypassCorsUrl,    // String : REQUIRED.
+                    // The url Bypass Cors is listening at. 
+                    // e.g. http://localhost:3167/
+
+  { 
+    url,            // String : REQUIRED 
+                    // The target url.
+                    // e.g. https://en.wikipedia.org/wiki/World_Chess_Championship
+
+    headers,        // Object : REQUIRED.
+                    // The headers which will be used for the final
+                    // GET/POST request to the target url.
+                    // e.g.    
+                    // { 
+                    //   "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+                    //   "Accept-language": "en-GB,en;q=0.9,en-US;q=0.8,el;q=0.7",
+                    //   "Accept-Encoding": "gzip,deflate",
+                    //   "cache-control": "max-age=0",
+                    //   "Host": "en.wikipedia.org",
+                    //   "Origin": "https://en.wikipedia.org",
+                    //   "upgrade-insecure-requests": "1",
+                    //   "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"
+                    //  }
+                        
+    cookies,        // Array of Objects : OPTIONAL
+                    // The cookies to be sent with the GET/POST request.
+                    // The cookie Object can have the following pairs of keys : 
+                    // "key"/"value" or "name"/"value".
+                    // e.g. 
+                    // [
+                    //   {
+                    //       "key": "cookie_key",
+                    //       "value": "cookie_value"
+                    //   },
+                    //   {
+                    //       "name": "cookie_key",
+                    //       "value": "cookie_value"
+                    //   },
+                    //   ....
+                    // ]                
+
+    post,           // Boolean : OPTIONAL , defaults to false.
+                    // Set this to true if you want to POST to target Url , 
+                    // else GET request will be performed.
+                    // e.g. true
+
+    fullPageRender, // Boolean : OPTIONAL , defaults to false.
+                    // Cant't be combined with post : true.
+                    // If you want to get html source after 
+                    // full page rendering,  i.e. all javascript
+                    // has been executed and all resources fetched ,
+                    // set this to true.
+                    // e.g. true
+
+    javascript,     // String : OPTIONAL , defaults to ""
+                    // Applied only when fullPageRender : true.
+                    // Evals and executes the given Javascript code
+                    // when page is fully loaded.
+                    // Usefull when user action need's to be taken,
+                    // before Bypass Cors retreives html to web app.
+                    // e.g. 
+                    // `
+                    // let button = document.querySelector('.show-more-items');
+                    // button.click();
+                    // `
+
+    scrollInterval, // Number : OPTIONAL , defaults to 500.
+                    // Applied only when fullPageRender : true.
+                    // After custom Javascript execution (if any),
+                    // Bypass CORS scrolls down the page from top
+                    // to bottom , at "scrollInterval" ms interval,
+                    // in order to retrieve the real innerHTML. 
+                    // e.g. 1000
+
+    debug           // Boolean : OPTIONAL , defaults to false
+                    // Applied only when fullPageRender : true AND
+                    // your web app is running at localhost (TEST ONLY).  
+                    // Shows the Electron Browser Window loading the page.
+                    // You need to manually close the window,
+                    // after execution.
+                    // e.g. true
+  })
+.then(res => {      // here you get the requested html + cookies!
+  let { html, cookies } = res.data
+}) </code></pre>
+            </li>
+          </ol>
+          <div id="demo">
+            <h2 class="text-center"> Demo</h2>
+            <p> To see Bypass Cors in action, you have to :</p>
+            <ol>
+              <li>Install Bypass Cors to your machine.</li>
+              <li>Add the domain "https://chrishham.github.io/BypassCors/" to
+                the "Whitelist Domains" textarea.
+              </li>
+              <li>Press the "Restart Server" button, for the changes to take effect.</li>
+            </ol>
+            <section class="settings">
+              <h3 class="text-center">Settings Area</h3>
+              <div class="form-group">
+                <label for="bypassCorsUrl"><b>Bypass Cors Url :</b> </label>
+                <input type="text" v-model="bypassCorsUrl" id="bypassCorsUrl">
+              </div>
+              <div class="form-group">
+                <label for="targetUrl"><b>Target Url : </b> </label>
+                <input type="text" v-model="url" id="targetUrl" class="targetUrl">
+              </div>
+              <div class="form-group">
+                <label for="headersTxt"><b> Headers : </b> </label>
+                <textarea v-model="headersTxt" id="headersTxt" class="headersTxt">
+                </textarea>
+              </div>
+              <div class="cookies">
+                <label for="cookiesTxt"><b> Cookies : </b> </label>
+                <textarea v-model="cookiesTxt" id="cookiesTxt" class="cookiesTxt">
+                </textarea>
+              </div>
+              <div class="form-group">
+                <label for="post"><b>Post : </b> </label>
+                <label for="postYes"> Yes </label>
+                <input type="radio" v-model="post" id="postYes" :value="true">
+                <label for="postNo"> No </label>
+                <input type="radio" v-model="post" id="postNo" :value="false">
+              </div>
+              <div class="form-group">
+                <label for="fullPageRender"><b>Full Page Render : </b> </label>
+                <label for="fullPageRenderYes"> Yes </label>
+                <input type="radio" v-model="fullPageRender" id="fullPageRenderYes" :value="true">
+                <label for="fullPageRenderNo"> No </label>
+                <input type="radio" v-model="fullPageRender" id="fullPageRenderNo" :value="false">
+              </div>
+              <div class="javascript">
+                <label for="javascriptTxt"><b> Javascript : </b> </label>
+                <textarea v-model="javascriptTxt" id="javascriptTxt" class="javascriptTxt">
+                </textarea>
+              </div>
+              <div class="form-group">
+                <label for="scrollInterval"><b>Scroll Interval : </b> </label>
+                <input type="number" min="0" max="10000" v-model="scrollInterval" id="scrollInterval"
+                  class="scrollInterval"> ms
+              </div>
+              <div class="form-group">
+                <label for="debug"><b>Full Page Render : </b> </label>
+                <label for="debugYes"> Yes </label>
+                <input type="radio" v-model="debug" id="debugYes" :value="true">
+                <label for="debugNo"> No </label>
+                <input type="radio" v-model="debug" id="debugNo" :value="false">
+              </div>
+              <div class="text-center">
+                <button class="btn btn-primary" @click="getHTML"> Get HTML!</button>
+              </div>
+            </section>
+            <section class="html mt-3">
+              <h3 class="text-center">HTML rendered in an iframe</h3>
+              <iframe ref="iframeContent" src="about:blank" class="whatScraperSees"></iframe>
+            </section>
+          </div>
+          <hr>
+          <p class="text-center"> An
+            <a href="https://electronjs.org/" target="_blank"> Electron </a>
+            app, created with ❤️ by Christopher Chamaletsos.
+          </p>
+        </div> <!-- MAIN CONTENT -->
       </div>
     </div>
   </div>
@@ -150,7 +309,26 @@ axios
       el: '#app',
       data: {
         osActive: "Windows",
-        version: ''
+        version: '',
+        bypassCorsUrl: 'http://localhost:3167/',
+        url: 'https://en.wikipedia.org/wiki/World_Chess_Championship',
+        headersTxt: `{ 
+  "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+  "Accept-language": "en-GB,en;q=0.9,en-US;q=0.8,el;q=0.7",
+  "Accept-Encoding": "gzip,deflate",
+  "cache-control": "max-age=0",
+  "Host": "en.wikipedia.org",
+  "Origin": "https://en.wikipedia.org",
+  "upgrade-insecure-requests": "1",
+  "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"
+}`,
+        cookiesTxt: '',
+        post: false,
+        fullPageRender: false,
+        javascriptTxt: "",
+        scrollInterval: 500,
+        debug: false,
+        html: ""
       },
       computed: {
         latestReleaseBaseUrl() {
@@ -167,6 +345,45 @@ axios
         }
       },
       methods: {
+        getHTML() {
+          let headers
+          let cookies
+          try {
+            headers = JSON.parse(this.headersTxt)
+          } catch (e) {
+            return alert(e)
+          }
+          try {
+            if (this.cookiesTxt) {
+              cookies = JSON.parse(this.cookiesTxt)
+            }
+          } catch (e) {
+            console.log(e)
+          }
+
+          axios.post(
+            this.bypassCorsUrl,
+            {
+              url: this.url,
+              headers,
+              cookies,
+              post: this.post,
+              fullPageRender: this.fullPageRender,
+              javascript: this.javascript,
+              scrollInterval: +this.scrollInterval,
+              debug: this.debug
+            })
+            .then(res => {      // here you get the requested html + cookies!
+              let { html, cookies } = res.data
+              this.cookiesTxt = JSON.stringify(cookies)
+              this.html = html
+              let frame = this.$refs.iframeContent.contentWindow;
+              frame.document.open("text/html", "replace");
+              frame.document.write(html);
+              frame.document.close();
+            })
+            .catch(error => console.log(error))
+        }
       },
       created() {
         let os = getOS()

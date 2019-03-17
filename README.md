@@ -2,7 +2,7 @@
 
 NEVER again let not enabled CORS domains , stand in your Web App's way to acquiring publicly available web resources!
 
-You can read more about the app's purpose at our live [site](https://chrishham.github.io/BypassCors/).
+You can find installation instructions, description of the API and a Live Demo at the official Bypass Cors [site](https://chrishham.github.io/BypassCors/).
 
 ## Getting Started (For Developers)
 

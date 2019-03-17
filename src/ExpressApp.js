@@ -85,7 +85,7 @@ function ExpressApp (expressServerSettings) {
 }
 
 function newBrowserWindow ({ headers, url, javascript, scrollInterval, debug, cookies }) {
-  scrollInterval = scrollInterval || 500
+  if (scrollInterval !== 0) scrollInterval = scrollInterval || 500
   return new Promise((resolve, reject) => {
     let win = new BrowserWindow({
       width: 1000,

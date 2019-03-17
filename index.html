@@ -10,12 +10,26 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.5.0/themes/prism.min.css">
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
   <link rel="stylesheet" href="github_pages/index.css">
+  <link rel="stylesheet" href="github_pages/loading.css">
   <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 </head>
 
 <body>
   <div id='app'>
     <div class="container-fluid">
+      <transition name='modal' v-if="isLoading">
+        <div class="modal-mask">
+          <div class="modal-container text-center">
+            <img src="github_pages/loading.gif" alt="">
+            <p class="status saving">
+              {{status}}
+              <span>.</span>
+              <span>.</span>
+              <span>.</span>
+            </p>
+          </div>
+        </div>
+      </transition>
       <div class="github">
         <a href="https://github.com/chrishham/BypassCors" target="_blank"><img width="149" height="149"
             src="https://github.blog/wp-content/uploads/2008/12/forkme_right_darkblue_121621.png?resize=149%2C149"
@@ -287,6 +301,8 @@
               </div>
               <div class="text-center">
                 <button class="btn btn-primary" @click="getHTML"> Get HTML!</button>
+                <span class="ml-3">Execution time : {{executionSeconds}}
+                  second{{executionSeconds===1 ? "" : 's'}}.</span>
               </div>
             </section>
             <section class="html mt-3">
@@ -308,6 +324,8 @@
     var app = new Vue({
       el: '#app',
       data: {
+        isLoading: false,
+        status: "",
         osActive: "Windows",
         version: '',
         bypassCorsUrl: 'http://localhost:3167/',
@@ -317,8 +335,6 @@
   "Accept-language": "en-GB,en;q=0.9,en-US;q=0.8,el;q=0.7",
   "Accept-Encoding": "gzip,deflate",
   "cache-control": "max-age=0",
-  "Host": "en.wikipedia.org",
-  "Origin": "https://en.wikipedia.org",
   "upgrade-insecure-requests": "1",
   "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36"
 }`,
@@ -328,7 +344,8 @@
         javascriptTxt: "",
         scrollInterval: 500,
         debug: false,
-        html: ""
+        html: "",
+        executionSeconds: 0
       },
       computed: {
         latestReleaseBaseUrl() {
@@ -360,6 +377,10 @@
           } catch (e) {
             console.log(e)
           }
+          this.html = ""
+          this.isLoading = true
+          this.status = "Fetching requested html"
+          let startTime = new Date();
 
           axios.post(
             this.bypassCorsUrl,
@@ -382,7 +403,21 @@
               frame.document.write(html);
               frame.document.close();
             })
-            .catch(error => console.log(error))
+            .catch(error => {
+              alert(error)
+              console.log(error)
+            })
+            .then(() => {
+              this.isLoading = false
+              this.status = ""
+              let endTime = new Date();
+              let timeDiff = endTime - startTime; //in ms
+              // strip the ms
+              timeDiff /= 1000;
+              // get seconds
+              let seconds = Math.round(timeDiff);
+              this.executionSeconds = seconds;
+            })
         }
       },
       created() {

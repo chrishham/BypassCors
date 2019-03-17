@@ -34,10 +34,7 @@ function ExpressApp (expressServerSettings) {
 
     if (fullPageRender) return newBrowserWindow({ headers, url, javascript, scrollInterval, debug, cookies })
       .then(response => res.send(response))
-      .catch(error => {
-        // console.log(error.message)
-        res.status(500).send(error.message)
-      })
+      .catch(error => res.status(500).send('Request Failed!'))
 
     const cookieJar = request.jar()
     if (cookies && cookies.length > 0) setRequestCookies(cookies, cookieJar, url)
@@ -70,7 +67,7 @@ function ExpressApp (expressServerSettings) {
       })
       .catch(error => {
         console.log(error)
-        res.status(500).send(error)
+        res.status(500).send('Request Failed!')
       })
   })
 

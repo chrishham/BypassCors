@@ -75,3 +75,8 @@ textarea.javascriptTxt {
 img.cors_error {
   height: 80px;
 }
+
+img.app_main_photo {
+  border: 2px solid black;
+  max-height: 550px;
+}

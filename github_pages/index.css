@@ -68,4 +68,10 @@ textarea.javascriptTxt {
   min-height: 300px;
 } */
 
+.githubIcon {
+  width: 25px;
+}
 
+img.cors_error {
+  height: 80px;
+}

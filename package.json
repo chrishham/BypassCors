@@ -4,6 +4,7 @@
   "version": "0.3.0",
   "author": "Christopher Chamaletsos",
   "repository": "https://github.com/chrishham/BypassCors",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",

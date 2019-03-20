@@ -48,6 +48,9 @@
               <a class="nav-link" href="#usage">Instructions for Developers</a>
             </li>
             <li class="nav-item">
+              <a class="nav-link" href="#api">API</a>
+            </li>
+            <li class="nav-item">
               <a class="nav-link" href="#demo">Demo</a>
             </li>
           </ul>
@@ -65,6 +68,84 @@
           <p> NEVER again let not enabled CORS domains , stand in your Web App's way to acquiring
             publicly available web resources !
           </p>
+
+          <h4>
+            What it does
+          </h4>
+          <p>
+            It helps web apps running at user's browser , or any program that speaks HTTP ,
+            to fetch HTML files residing anywhere in the web , that the user's browser can navigate to.
+          </p>
+
+          <h4>The problem that it solves</h4>
+          <p>
+            All modern Web Browsers enforce MANY restrictions to the way a Web App that services the user,
+            makes use of the web.
+          </p>
+          One of them is the <a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS">Cross-Origin Resource
+            Sharing (CORS)</a> mechanism.
+          </p>
+          <p>
+            In simple terms , CORS mechanism doesnt't allow ANY Web App to access a resource of another Domain,
+            unless the other Domain has EXPLICITLY allowed to.
+          </p>
+          <p>
+            That means that despite that you , the user , have access to all the content of the web
+            (given that you are not behind a firewall ) , the Web App that needs it to provide you with
+            updated /currated /aggregated content from other resources , DOESN'T!
+          </p>
+
+          <p>
+            For example , if a Web App needs to display the list of all the "World Chess Champions" and issues a GET
+            request to "https://en.wikipedia.org/wiki/World_Chess_Championship", it will be greeted with this dreadful
+            error message:
+            <br>
+            <img src="github_pages/CORS_error.png" alt="CORS error" class="cors_error mt-2 img-fluid">
+          </p>
+          <p>
+            Bypass Cors does what it's name says: Bypasses CORS restrictions PERMANENTLY!
+          </p>
+
+          <p>
+            Watch how this Web App (that you are viewing right now) , manages to get the HTML of the "World Chess Champions" ,
+            at the <a href="#demo">demo</a> section.
+          </p>
+
+          <h4>How it works</h4>
+          <p>
+            Bypass Cors is an installable <a href="https://electronjs.org/">Electron</a> App (Windows/Mac/Linux).
+          </p>
+          <p>
+            When it starts, it checks the status of the machine's Internet Connection, by issuing
+            an Http GET request to <i>"https://www.google.com"</i>.
+          </p>
+
+          <p>
+            If the machine hasn't access to the Internet,  a red light and a warning message appears ,
+            telling the user to check his proxy settings / internet connection.
+          </p>
+
+          <p>
+            If everything is ok , a green light goes on. An <a href="https://expressjs.com/" target="_blank">Express</a>
+            Web Server begins listening for requests at "<i>http://localhost:3167/</i>" (user can change the port) .
+          </p>
+          <p>
+            The Web App can issue a <a href="#usage">POST request</a> to this endpoint and take as a response the HTML
+            document it wants.
+          </p>
+          <p>
+            The Web App can then parse the retreived HTML and extract any data it wants from it, using any HTML parser it wants.
+          </p>
+          <h4>Highlights</h4>
+
+          <ul>
+            <li><a href="https://github.com/chrishham/BypassCors" target="_blank">Open Source!</a></li>
+            <li>Free of Charge!</li>
+            <li>Full page render & Javascript support!</li>
+            <li>Cookie support!</li>
+            <li>POST request support!</li>
+            <li>Ideal for Real Time Scraping!</li>
+          </ul>
           <hr>
           <h2 id="installation" class="text-center">Installation</h2>
           <p class="text-left">
@@ -147,10 +228,21 @@
               For the change to take effect , they have to press the "Restart Server" button.
             </li>
             <li>Issue an http POST request from your web app, to the url Bypass Cors is listening at.
-              Default address is http://localhost:3167/, but user can change the port. Example below makes
+              Default address is http://localhost:3167/, but user can change the port. Code snippet below makes
               use of the ES6 feature : <a href="http://es6-features.org/#PropertyShorthand" target="_blank"> property
-                shorthand.</a> All variables have to be declared & assigned values , beforehand.
-              <pre><code class="language-javascript">axios.post(
+                shorthand.</a> All variables have to be declared & assigned values , beforehand. Look up what
+              each variable does , at the <a href="#api">API </a> section.
+              <pre><code class="language-javascript">axios.post(bypassCorsUrl,{ 
+  url,headers,cookies,post,fullPageRender,javascript,scrollInterval,debug})
+  .then(res => {
+    let { html, cookies } = res.data
+    // rest of your code here
+  })
+              </code></pre>
+            </li>
+          </ol>
+          <h2 class="text-center" id="api">API</h2>
+          <pre><code class="language-javascript">axios.post(
   bypassCorsUrl,    // String : REQUIRED.
                     // The url Bypass Cors is listening at. 
                     // e.g. http://localhost:3167/
@@ -236,8 +328,6 @@
 .then(res => {      // here you get the requested html + cookies!
   let { html, cookies } = res.data
 }) </code></pre>
-            </li>
-          </ol>
           <div id="demo">
             <h2 class="text-center"> Demo</h2>
             <p> To see Bypass Cors in action, you have to :</p>
@@ -314,6 +404,10 @@
           <p class="text-center"> An
             <a href="https://electronjs.org/" target="_blank"> Electron </a>
             app, created with ❤️ by Christopher Chamaletsos.
+            <br>
+            <a href="https://github.com/chrishham/BypassCors/blob/master/LICENSE" target="_blank">MIT</a> license.
+            Hosted at <a href="https://github.com/chrishham/BypassCors" target="_blank"><img
+                src="github_pages/GithubIcon.svg" alt="Github Icon" class="githubIcon"> </a>.
           </p>
         </div> <!-- MAIN CONTENT -->
       </div>

@@ -3,6 +3,7 @@ const request = require('request-promise')
 const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
+const lowercaseKeys = require('lowercase-keys')
 
 function ExpressApp (expressServerSettings) {
   let expressServer
@@ -32,6 +33,8 @@ function ExpressApp (expressServerSettings) {
     if (!headers) return res.status(500).send('Headers are required!')
     if (post && fullPageRender) return res.status(500).send(`Can't combine post and fullPageRender`)
 
+    headers = lowercaseKeys(headers)
+
     if (fullPageRender) return newBrowserWindow({ headers, url, javascript, scrollInterval, debug, cookies })
       .then(response => res.send(response))
       .catch(error => res.status(500).send('Request Failed!'))
@@ -39,7 +42,7 @@ function ExpressApp (expressServerSettings) {
     const cookieJar = request.jar()
     if (cookies && cookies.length > 0) setRequestCookies(cookies, cookieJar, url)
 
-    let gzip = headers['Accept-Encoding'] && headers['Accept-Encoding'].indexOf('gzip') !== -1 ? true : false
+    let gzip = headers['accept-encoding'] && /gzip/i.test(headers['accept-encoding']) ? true : false
 
     Promise.resolve()
       .then(() => {
@@ -101,7 +104,7 @@ function newBrowserWindow ({ headers, url, javascript, scrollInterval, debug, co
 
     let extraHeaders = ""
     for (let headerName in headers) {
-      if (headerName.toLowerCase() !== 'user-agent') {
+      if (headerName !== 'user-agent') {
         extraHeaders += headerName + ':' + headers[headerName] + '\n'
       }
     }

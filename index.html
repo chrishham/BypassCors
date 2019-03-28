@@ -254,11 +254,20 @@
               For the change to take effect , they have to press the "Restart Server" button.
             </li>
             <li>Issue an http POST request from your web app, to the url Bypass Cors is listening at.
-              Default address is http://localhost:3167/, but user can change the port. Code snippet below makes
+              Default address is http://localhost:3167/, but user can change the port. Example below makes
               use of the ES6 feature : <a href="http://es6-features.org/#PropertyShorthand" target="_blank"> property
-                shorthand.</a> All variables have to be declared & assigned values , beforehand. Look up what
+                shorthand.</a> Look up what
               each variable does , at the <a href="#api">API </a> section.
-              <pre><code class="language-javascript">axios.post(bypassCorsUrl,{ 
+              <pre><code class="language-javascript">  let bypassCorsUrl = "http://localhost:3167/"
+  let url = "https://en.wikipedia.org/wiki/World_Chess_Championship"
+  let cookies = [ ]
+  let post = false
+  let fullPageRender = false
+  let javascript = ""
+  let scrollInterval = 500
+  let debug = false
+
+  axios.post(bypassCorsUrl,{ 
   url,headers,cookies,post,fullPageRender,javascript,scrollInterval,debug})
   .then(res => {
     let { html, cookies } = res.data

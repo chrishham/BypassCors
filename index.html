@@ -261,7 +261,7 @@
               <pre><code class="language-javascript">  let bypassCorsUrl = "http://localhost:3167/"
   let url = "https://en.wikipedia.org/wiki/World_Chess_Championship"
   let cookies = [ ]
-  let post = false
+  let post = null
   let fullPageRender = false
   let javascript = ""
   let scrollInterval = 500
@@ -320,10 +320,11 @@
                     //   ....
                     // ]                
 
-    post,           // Boolean : OPTIONAL , defaults to false.
-                    // Set this to true if you want to POST to target Url , 
+    post,           // Object : OPTIONAL , defaults to null.
+                    // FormData Object to be sent along post request
+                    // If it is !== null a POST request will be performed to target Url , 
                     // else GET request will be performed.
-                    // e.g. true
+                    // e.g. { number_of_items:6 }
 
     fullPageRender, // Boolean : OPTIONAL , defaults to false.
                     // Cant't be combined with post : true.
@@ -373,7 +374,7 @@
               <li>Add the domain "https://chrishham.github.io" to
                 the "Whitelist Domains" textarea.
               </li>
-              <li>Press the "Restart Server" button, for the changes to take effect.</li>
+              <li>Press the "Restart Server" button.</li>
             </ol>
             <section class="settings">
               <h3 class="text-center">Settings Area</h3>

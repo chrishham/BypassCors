@@ -270,7 +270,7 @@
   axios.post(bypassCorsUrl,{ 
   url,headers,cookies,post,fullPageRender,javascript,scrollInterval,debug})
   .then(res => {
-    let { html, cookies } = res.data
+    let { html, cookies ,fullResponse } = res.data
     // rest of your code here
   })
               </code></pre>
@@ -362,8 +362,8 @@
                     // after execution.
                     // e.g. true
   })
-.then(res => {      // here you get the requested html + cookies!
-  let { html, cookies } = res.data
+.then(res => {      // here you get the requested html + cookies + fullResponse(only when fullPageRender=false)
+  let { html, cookies , fullResponse } = res.data
 }) </code></pre>
           <hr>
           <div id="demo">

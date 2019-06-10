@@ -54,19 +54,21 @@ function ExpressApp (expressServerSettings) {
           form: post.form,
           followRedirect: false,
           proxy: behindProxy ? proxy : false,
-          jar: cookieJar
+          jar: cookieJar,
+          resolveWithFullResponse: true
         })
         return request({
           url,
           headers,
           gzip,
           proxy: behindProxy ? proxy : false,
-          jar: cookieJar
+          jar: cookieJar,
+          resolveWithFullResponse: true
         })
       })
-      .then(html => {
+      .then(fullResponse => {
         cookies = cookieJar ? cookieJar.getCookies(url) : null
-        res.json({ html, cookies })
+        res.json({ html: fullResponse.body, cookies, fullResponse })
       })
       .catch(error => {
         console.log(error)

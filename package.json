@@ -1,7 +1,7 @@
 {
   "name": "bypass-cors",
   "description": "Adding Horsepower to Web Apps!",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "author": "Christopher Chamaletsos",
   "repository": "https://github.com/chrishham/BypassCors",
   "license": "MIT",

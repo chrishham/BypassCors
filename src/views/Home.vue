@@ -47,7 +47,7 @@ const opn = require("opn");
 
 export default {
   components: { LoadingModal },
-  data() {
+  data () {
     return {
       port: 0,
       runningPort: 0,
@@ -61,7 +61,7 @@ export default {
     };
   },
   watch: {
-    port(newPort, oldPort) {
+    port (newPort, oldPort) {
       if (newPort < 0 || newPort > 65535) {
         this.$notify({
           message: "Port has to be in the range 0 - 65535.",
@@ -75,7 +75,7 @@ export default {
       this.port = newPort;
     }
   },
-  created() {
+  created () {
     let self = this;
     this.isLoading = true;
     this.loadingStatus = "Restarting server";
@@ -107,7 +107,7 @@ export default {
     ipcRenderer.send("getExpressServerSettings");
   },
   methods: {
-    restartServer() {
+    restartServer () {
       this.isLoading = true;
       this.loadingStatus = "Restarting server";
       let whitelistDomains = this.whitelistDomainsTextarea
@@ -121,10 +121,10 @@ export default {
         proxy: this.proxy
       });
     },
-    revertChanges() {
+    revertChanges () {
       ipcRenderer.send("getExpressServerSettings");
     },
-    expressServerError(event, message) {
+    expressServerError (event, message) {
       this.$notify({
         message,
         type: "danger",
@@ -136,7 +136,7 @@ export default {
       this.errorMessage = message;
       this.isLoading = false;
     },
-    expressServerSuccess(event, message) {
+    expressServerSuccess (event, message) {
       this.$notify({
         message: "Server restart: Success!",
         type: "success",
@@ -147,7 +147,7 @@ export default {
       this.serverIsUp = true;
       this.isLoading = false;
     },
-    open(url) {
+    open (url) {
       opn(url);
     }
   }

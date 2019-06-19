@@ -6,16 +6,17 @@ import {
   installVueDevtools
 } from 'vue-cli-plugin-electron-builder/lib'
 import { ExpressApp } from './ExpressApp'
-require('events').EventEmitter.defaultMaxListeners = 15;
+require('events').EventEmitter.defaultMaxListeners = 15
 const path = require('path')
-const AutoLaunch = require('auto-launch');
-const { autoUpdater } = require("electron-updater")
-const settings = require('electron-settings');
-const contextMenu = require('electron-context-menu');
+const AutoLaunch = require('auto-launch')
+const { autoUpdater } = require('electron-updater')
+const settings = require('electron-settings')
+const contextMenu = require('electron-context-menu')
+const parseDomain = require('parse-domain')
 
 contextMenu({
   prepend: (params, browserWindow) => []
-});
+})
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
@@ -75,8 +76,8 @@ function createWindow () {
 }
 
 app.on('ready', function () {
-  autoUpdater.checkForUpdatesAndNotify();
-});
+  autoUpdater.checkForUpdatesAndNotify()
+})
 // Quit when all windows are closed.
 app.on('window-all-closed', () => {
   app.quit()
@@ -127,12 +128,14 @@ app.on('ready', () => {
   tray = new Tray(trayImage)
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: 'Show App', click: function () {
+      label: 'Show App',
+      click: function () {
         win.show()
       }
     },
     {
-      label: 'Quit', click: function () {
+      label: 'Quit',
+      click: function () {
         app.isQuiting = true
         app.quit()
         app.exit()
@@ -150,21 +153,19 @@ app.on('ready', () => {
  */
 var bypassCorsAutoLauncher = new AutoLaunch({
   name: 'Bypass Cors'
-});
+})
 
-bypassCorsAutoLauncher.enable();
+bypassCorsAutoLauncher.enable()
 
 bypassCorsAutoLauncher.isEnabled()
   .then(function (isEnabled) {
     if (isEnabled) {
       console.log('Bypass cors is enabled to start at startup!')
-      return;
+      return
     }
-    bypassCorsAutoLauncher.enable();
+    bypassCorsAutoLauncher.enable()
   })
-  .catch(function (err) {
-    console.log(error)
-  });
+  .catch((error) => console.log(error))
 
 /*
  Bypass Cors configuration.
@@ -176,12 +177,19 @@ if (!settings.has('expressServerSettings')) {
   settings.set('expressServerSettings', {
     port: '3167',
     whitelistDomains: []
-  });
+  })
 }
 
-let expressServerSettings = settings.get('expressServerSettings')
-
 ipcMain.on('restartExpressServer', (event, expressServerSettings) => {
+  expressServerSettings.whitelistDomains =
+    expressServerSettings.whitelistDomains
+      .map(el => {
+        let parsedDomain = parseDomain(el)
+        if (!parsedDomain) return // localhost
+        if (!parsedDomain.domain || !parsedDomain.tld) return
+        return parsedDomain.domain + '.' + parsedDomain.tld
+      })
+      .filter(el => el)
   settings.set('expressServerSettings', expressServerSettings)
   restartExpressServer(expressServerSettings)
   win.webContents.send('expressServerSettings', expressServerSettings)
@@ -193,17 +201,17 @@ ipcMain.on('getExpressServerSettings', (event) => {
 })
 
 function restartExpressServer (expressServerSettings) {
-  if (expressServer) expressServer.close();
+  if (expressServer) expressServer.close()
   expressServer = ExpressApp(expressServerSettings)
   expressServer.on('error', function (e) {
     let message = e.message
     console.log(message)
-    if (/EADDRINUSE/.test(e.message)) message = "Port is already in use. Please try a different one."
+    if (/EADDRINUSE/.test(e.message)) message = 'Port is already in use. Please try a different one.'
     if (/EACCES/.test(e.message)) message = "You don't have permissions to use this port. Try the 1024 - 65535 range."
     expressServer.removeListener('success', success)
     expressServer.close()
     win.webContents.send('expressServerError', message)
-  });
+  })
   expressServer.on('success', success)
 
   function success () {

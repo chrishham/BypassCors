@@ -1,33 +1,34 @@
-import { BrowserWindow, ipcMain } from 'electron'
+import { BrowserWindow } from 'electron'
 const request = require('request-promise')
 const express = require('express')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 const lowercaseKeys = require('lowercase-keys')
+const parseDomain = require('parse-domain')
 
 function ExpressApp (expressServerSettings) {
   let expressServer
   let { port, whitelistDomains, behindProxy, proxy } = expressServerSettings
   const app = express()
-  var corsOptions = {
-    origin: function (origin, callback) {
-      // when user access Bypass Cors url directly in his browser , origin is undefined
-      if (!origin) return callback(null, true)
-      if (whitelistDomains.indexOf(origin) !== -1) {
-        callback(null, true)
-      } else {
-        callback(new Error('Not allowed by CORS'))
-      }
-    }
+
+  const checkDomain = (req, res, next) => {
+    let origin = req.get('origin')
+    if (!origin) return next() // directly accessed from browser
+    let parsedDomain = parseDomain(origin)
+    if (!parsedDomain) return next() // localhost
+    let domain = parsedDomain.domain + '.' + parsedDomain.tld
+    if (whitelistDomains.indexOf(domain) === -1) return res.status(403).send(`Domain : ${domain} is not WhiteListed.`)
+    next()
   }
-  app.use(cors(corsOptions))
+  app.use(cors())
+  app.use(checkDomain)
   app.use(bodyParser.json())
 
   app.get('/', (req, res) => res.send('Bypass CORS is up and running!'))
 
   app.post('/', (req, res) => {
     let { headers, url, post, fullPageRender, javascript, scrollInterval, debug, cookies } = req.body
-    let origin = req.get('origin');
+    let origin = req.get('origin')
     if (!/^http(s)?:\/\/localhost:/.test(origin)) debug = false
     if (!url) return res.status(500).send('Url is required!')
     if (!headers) return res.status(500).send('Headers are required!')
@@ -35,28 +36,32 @@ function ExpressApp (expressServerSettings) {
 
     headers = lowercaseKeys(headers)
 
-    if (fullPageRender) return newBrowserWindow({ headers, url, javascript, scrollInterval, debug, cookies })
-      .then(response => res.send(response))
-      .catch(error => res.status(500).send('Request Failed!'))
+    if (fullPageRender) {
+      return newBrowserWindow({ headers, url, javascript, scrollInterval, debug, cookies })
+        .then(response => res.send(response))
+        .catch(error => res.status(500).send(error.message))
+    }
 
     const cookieJar = request.jar()
     if (cookies && cookies.length > 0) setRequestCookies(cookies, cookieJar, url)
 
-    let gzip = headers['accept-encoding'] && /gzip/i.test(headers['accept-encoding']) ? true : false
+    let gzip = !!(headers['accept-encoding'] && /gzip/i.test(headers['accept-encoding']))
 
     Promise.resolve()
       .then(() => {
         // console.log(headers)
-        if (post) return request.post({
-          url,
-          headers,
-          gzip,
-          form: post.form,
-          followRedirect: false,
-          proxy: behindProxy ? proxy : false,
-          jar: cookieJar,
-          resolveWithFullResponse: true
-        })
+        if (post) {
+          return request.post({
+            url,
+            headers,
+            gzip,
+            form: post.form,
+            followRedirect: false,
+            proxy: behindProxy ? proxy : false,
+            jar: cookieJar,
+            resolveWithFullResponse: true
+          })
+        }
         return request({
           url,
           headers,
@@ -80,11 +85,11 @@ function ExpressApp (expressServerSettings) {
     console.log(`ByPass CORS listening on port ${port}!`)
     let googleRequest = request({ url: 'https://www.google.com/', gzip: true, proxy: behindProxy ? proxy : false })
     let promiseTimeout = new Promise((resolve, reject) => {
-      setTimeout(() => reject('err'), 10000);
-    });
+      setTimeout(() => reject(new Error('Timeout of ')), 10000)
+    })
     Promise.race([googleRequest, promiseTimeout])
       .then(response => expressServer.emit('success'))
-      .catch(error => expressServer.emit('error', new Error('No access to the internet. Check your network/proxy settings and try again.')))
+      .catch(error => expressServer.emit('error', error.message))
   })
   return expressServer
 }
@@ -104,7 +109,7 @@ function newBrowserWindow ({ headers, url, javascript, scrollInterval, debug, co
     })
     let userAgent = headers['user-agent']
 
-    let extraHeaders = ""
+    let extraHeaders = ''
     for (let headerName in headers) {
       if (headerName !== 'user-agent') {
         extraHeaders += headerName + ':' + headers[headerName] + '\n'
@@ -186,9 +191,9 @@ function setElectronCookies (cookies, ses) {
         cookie.name = cookie.key
         delete cookie.key
       }
-      const scheme = cookie.secure ? "https" : "http";
-      const host = cookie.domain[0] === "." ? cookie.domain.substr(1) : cookie.domain;
-      cookie.url = scheme + "://" + host;
+      const scheme = cookie.secure ? 'https' : 'http'
+      const host = cookie.domain[0] === '.' ? cookie.domain.substr(1) : cookie.domain
+      cookie.url = scheme + '://' + host
       ses.cookies.set(cookie, setCookieCb)
     })
     let cbCntr = 0
@@ -211,8 +216,8 @@ function setRequestCookies (cookies, cookieJar, url) {
       cookie.key = cookie.name
       delete cookie.name
     }
-    const requestCookie = request.cookie(`${cookie.key}=${cookie.value}`);
-    cookieJar.setCookie(requestCookie, url);
+    const requestCookie = request.cookie(`${cookie.key}=${cookie.value}`)
+    cookieJar.setCookie(requestCookie, url)
   })
 }
 

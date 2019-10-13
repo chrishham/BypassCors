@@ -5,11 +5,13 @@ const cors = require('cors')
 const bodyParser = require('body-parser')
 const lowercaseKeys = require('lowercase-keys')
 const parseDomain = require('parse-domain')
+let whitelistDomains = []
 
 function ExpressApp (expressServerSettings) {
   let expressServer
-  let { port, whitelistDomains, behindProxy, proxy } = expressServerSettings
+  let { port, behindProxy, proxy } = expressServerSettings
   const app = express()
+  whitelistDomains = [...expressServerSettings.whitelistDomains]
 
   const checkDomain = (req, res, next) => {
     let origin = req.get('origin')

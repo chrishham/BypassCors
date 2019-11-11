@@ -2,7 +2,7 @@
 #app
   //- #nav
   //-   router-link(to='/') Settings
-  //-   |  |   
+  //-   |  |
   //-   router-link(to='/about')  About
   notifications
   router-view
@@ -10,10 +10,10 @@
 </template>
 
 <script>
-import Footer from "@/components/Footer.vue";
+import Footer from '@/components/Footer.vue'
 export default {
   components: { Footer }
-};
+}
 </script>
 
 <style src="vue-notifyjs/themes/default.css"></style>

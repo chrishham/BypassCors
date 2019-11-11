@@ -8,11 +8,9 @@ import {
 import { ExpressApp } from './ExpressApp'
 require('events').EventEmitter.defaultMaxListeners = 15
 const path = require('path')
-const AutoLaunch = require('auto-launch')
 const { autoUpdater } = require('electron-updater')
 const settings = require('electron-settings')
 const contextMenu = require('electron-context-menu')
-const parseDomain = require('parse-domain')
 
 contextMenu({
   prepend: (params, browserWindow) => []
@@ -148,24 +146,6 @@ app.on('ready', () => {
     win.show()
   })
 })
-/*
- Enable Bypass Cors to start at startup
- */
-var bypassCorsAutoLauncher = new AutoLaunch({
-  name: 'Bypass Cors'
-})
-
-bypassCorsAutoLauncher.enable()
-
-bypassCorsAutoLauncher.isEnabled()
-  .then(function (isEnabled) {
-    if (isEnabled) {
-      console.log('Bypass cors is enabled to start at startup!')
-      return
-    }
-    bypassCorsAutoLauncher.enable()
-  })
-  .catch((error) => console.log(error))
 
 /*
  Bypass Cors configuration.
@@ -173,34 +153,8 @@ bypassCorsAutoLauncher.isEnabled()
 
 let expressServer
 
-if (!settings.has('expressServerSettings')) {
-  settings.set('expressServerSettings', {
-    port: '3167',
-    whitelistDomains: []
-  })
-}
-
-ipcMain.on('restartExpressServer', (event, expressServerSettings) => {
-  expressServerSettings.whitelistDomains =
-    expressServerSettings.whitelistDomains
-      .map(el => {
-        let parsedDomain = parseDomain(el)
-        if (!parsedDomain) return // localhost
-        if (!parsedDomain.domain || !parsedDomain.tld) return
-        return parsedDomain.domain + '.' + parsedDomain.tld
-      })
-      .filter(el => el)
-  settings.set('expressServerSettings', expressServerSettings)
-  restartExpressServer(expressServerSettings)
-  win.webContents.send('expressServerSettings', expressServerSettings)
-})
-
-ipcMain.on('getExpressServerSettings', (event) => {
+ipcMain.on('restartExpressServer', () => {
   let expressServerSettings = settings.get('expressServerSettings')
-  win.webContents.send('expressServerSettings', expressServerSettings)
-})
-
-function restartExpressServer (expressServerSettings) {
   if (expressServer) expressServer.close()
   expressServer = ExpressApp(expressServerSettings)
   expressServer.on('error', function (e) {
@@ -218,4 +172,4 @@ function restartExpressServer (expressServerSettings) {
     // console.log('main process received success message!')
     win.webContents.send('expressServerSuccess')
   };
-}
+})

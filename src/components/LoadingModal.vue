@@ -12,8 +12,8 @@
 
 <script>
 export default {
-  props: ["status"]
-};
+  props: ['status']
+}
 </script>
 
 <style scoped>
@@ -69,7 +69,6 @@ p.status {
   -webkit-transform: scale(1.1);
   transform: scale(1.1);
 }
-
 
 @keyframes blink {
     /**

@@ -1,22 +1,21 @@
 {
   "name": "bypass-cors",
-  "description": "Adding Horsepower to Web Apps!",
   "version": "0.4.3",
-  "author": "Christopher Chamaletsos",
-  "repository": "https://github.com/chrishham/BypassCors",
-  "license": "MIT",
   "private": true,
+  "description": "Adding Horsepower to Web Apps!",
+  "author": "Christopher Chamaletsos",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "test": "eslint . --ext .js --fix ",
+    "lint": "vue-cli-service lint",
     "electron:build": "NO_PROXY=* vue-cli-service electron:build --mac dmg --config electron-builder.json",
     "electron:serve": "vue-cli-service electron:serve",
     "postinstall": "electron-builder install-app-deps",
-    "release": "NO_PROXY=* vue-cli-service electron:build --windows nsis --linux AppImage --mac dmg --config electron-builder.json -p always",
-    "test": "eslint . --ext .js --fix "
+    "release": "NO_PROXY=* vue-cli-service electron:build --windows nsis --linux AppImage --mac dmg --config electron-builder.json -p always"
   },
+  "main": "background.js",
   "dependencies": {
-    "auto-launch": "^5.0.5",
     "babel-helper-vue-jsx-merge-props": "^2.0.3",
     "bootstrap-vue": "^2.0.0",
     "cors": "^2.8.5",
@@ -36,7 +35,10 @@
   "devDependencies": {
     "@babel/polyfill": "^7.0.0-beta.53",
     "@vue/cli-plugin-babel": "^3.4.0",
+    "@vue/cli-plugin-eslint": "^4.0.5",
     "@vue/cli-service": "^3.4.0",
+    "@vue/eslint-config-standard": "^4.0.0",
+    "babel-eslint": "^10.0.3",
     "electron": "3",
     "eslint": "^5.16.0",
     "eslint-config-standard": "^12.0.0",
@@ -51,9 +53,6 @@
     "vue-cli-plugin-electron-builder": "^1.0.0-rc.10",
     "vue-template-compiler": "^2.5.21"
   },
-  "resolutions": {
-    "terser": "3.14.1"
-  },
   "postcss": {
     "plugins": {
       "autoprefixer": {}
@@ -64,5 +63,9 @@
     "last 2 versions",
     "not ie <= 8"
   ],
-  "main": "background.js"
+  "license": "MIT",
+  "repository": "https://github.com/chrishham/BypassCors",
+  "resolutions": {
+    "terser": "3.14.1"
+  }
 }

@@ -1,11 +1,9 @@
 'use strict'
 
 import { app, protocol, BrowserWindow, ipcMain, Menu, Tray, nativeImage } from 'electron'
-import {
-  createProtocol,
-  installVueDevtools
-} from 'vue-cli-plugin-electron-builder/lib'
+import { createProtocol } from 'vue-cli-plugin-electron-builder/lib'
 import { ExpressApp } from './ExpressApp'
+import installExtension, { VUEJS_DEVTOOLS } from 'electron-devtools-installer'
 require('events').EventEmitter.defaultMaxListeners = 15
 const path = require('path')
 const { autoUpdater } = require('electron-updater')
@@ -36,7 +34,7 @@ if (!gotTheLock) {
   })
 }
 // Standard scheme must be registered before the app is ready
-protocol.registerStandardSchemes(['app'], { secure: true })
+protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true } }])
 
 function createWindow () {
   // Create the browser window.
@@ -47,7 +45,13 @@ function createWindow () {
   win = new BrowserWindow({
     width: 800,
     height: 720,
-    icon: iconPath
+    icon: iconPath,
+    webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+      enableRemoteModule: true,
+      nodeIntegrationInWorker: true
+    }
   })
   win.setTitle(require('../electron-builder.json').productName + ' v' + require('../package.json').version)
   win.on('page-title-updated', (event, title) => {
@@ -95,7 +99,7 @@ app.on('activate', () => {
 app.on('ready', async () => {
   if (isDevelopment && !process.env.IS_TEST) {
     // Install Vue Devtools
-    await installVueDevtools()
+    await installExtension(VUEJS_DEVTOOLS)
   }
   createWindow()
 })
